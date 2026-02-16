@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  wikijs-mcp-server:
+    build: .
+    image: wikijs-mcp-server:latest
+    container_name: wikijs-mcp-server
+    stdin_open: true
+    tty: false
+    network_mode: host
+    environment:
+      - WIKIJS_API_URL=${WIKIJS_API_URL:-http://localhost:3000/graphql}
+      - WIKIJS_API_TOKEN=${WIKIJS_API_TOKEN}
+      - WIKIJS_SSL_VERIFY=${WIKIJS_SSL_VERIFY:-true}
+    # Uncomment to mount custom CA bundle
+    # volumes:
+    #   - /path/to/ca-bundle.crt:/ca-bundle.crt:ro
+    # environment:
+    #   - WIKIJS_CA_BUNDLE=/ca-bundle.crt
+    restart: unless-stopped
