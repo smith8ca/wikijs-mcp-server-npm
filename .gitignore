@@ -33,3 +33,6 @@ yarn-error.log*
 # Temporary files
 *.tmp
 .cache/
+
+# Internal documentation (not for public repo)
+PUBLISHING.md

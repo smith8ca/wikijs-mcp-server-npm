@@ -23,7 +23,7 @@ describe('Tool Handlers', () => {
   });
 
   it('should have valid schemas for all tools', () => {
-    for (const [name, definition] of Object.entries(toolDefinitions)) {
+    for (const [_name, definition] of Object.entries(toolDefinitions)) {
       expect(definition.description).toBeDefined();
       expect(definition.description.length).toBeGreaterThan(0);
       expect(definition.inputSchema).toBeDefined();

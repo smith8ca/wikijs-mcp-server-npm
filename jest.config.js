@@ -21,7 +21,7 @@ export default {
     '!src/**/*.d.ts',
     '!src/index.ts',
   ],
-  coverageThresholds: {
+  coverageThreshold: {
     global: {
       branches: 70,
       functions: 70,

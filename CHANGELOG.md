@@ -170,6 +170,7 @@ This project follows [Semantic Versioning](https://semver.org/):
 ### Migration from Python Version
 
 This TypeScript implementation provides feature parity with the Python version while adding:
+
 - Stronger type safety with TypeScript
 - Better IDE integration and autocomplete
 - Native Node.js ecosystem integration

@@ -61,16 +61,19 @@ Before contributing, ensure you have:
 ### Initial Setup
 
 1. **Install dependencies**:
+
    ```bash
    npm install
    ```
 
 2. **Set up environment variables**:
+
    ```bash
    cp .env.example .env
    ```
 
    Edit `.env` with your Wiki.js credentials:
+
    ```env
    WIKIJS_API_URL=http://localhost:3000/graphql
    WIKIJS_API_TOKEN=your_test_api_token
@@ -78,6 +81,7 @@ Before contributing, ensure you have:
    ```
 
 3. **Build the project**:
+
    ```bash
    npm run build
    ```
@@ -117,6 +121,7 @@ npm run clean          # Remove build artifacts
 ### Branching Strategy
 
 1. **Create a feature branch** from `main`:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
@@ -149,6 +154,7 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org/) speci
 ```
 
 **Types**:
+
 - `feat`: New feature
 - `fix`: Bug fix
 - `docs`: Documentation changes
@@ -183,12 +189,14 @@ Closes #123"
 ### Pull Request Workflow
 
 1. **Update your branch** with latest upstream changes:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
    ```
 
 2. **Run full test suite**:
+
    ```bash
    npm run lint
    npm run type-check
@@ -197,6 +205,7 @@ Closes #123"
    ```
 
 3. **Push to your fork**:
+
    ```bash
    git push origin feature/your-feature-name
    ```
@@ -214,6 +223,7 @@ Closes #123"
 5. **Error handling**: Always handle errors appropriately
 
 **Good Example**:
+
 ```typescript
 interface PageData {
   id: number;
@@ -233,12 +243,14 @@ async function getPage(path: string): Promise<PageData> {
 ```
 
 **Bad Example**:
+
 ```typescript
 // Don't do this
 function getPage(path: any): any {
-  return graphqlClient.query(GET_PAGE, { path })
+  return graphqlClient
+    .query(GET_PAGE, { path })
     .then((res: any) => res.data)
-    .catch((e: any) => console.log(e));  // Don't just log errors
+    .catch((e: any) => console.log(e)); // Don't just log errors
 }
 ```
 
@@ -248,17 +260,18 @@ function getPage(path: any): any {
 2. **Clear naming**: Use descriptive names for variables, functions, and files
 3. **Exports**: Use named exports, avoid default exports
 4. **Imports**: Group and order imports logically:
+
    ```typescript
    // 1. Node.js built-ins
-   import { readFileSync } from 'fs';
+   import { readFileSync } from "fs";
 
    // 2. External packages
-   import { Server } from '@modelcontextprotocol/sdk/server/index.js';
-   import axios from 'axios';
+   import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+   import axios from "axios";
 
    // 3. Internal modules
-   import { config } from './config/env.js';
-   import { GraphQLClient } from './graphql/client.js';
+   import { config } from "./config/env.js";
+   import { GraphQLClient } from "./graphql/client.js";
    ```
 
 ### ESLint Configuration
@@ -273,6 +286,7 @@ npm run lint:fix      # Auto-fix what's possible
 ### Code Comments
 
 - **JSDoc comments** for public functions and classes:
+
   ```typescript
   /**
    * Search for pages matching a query string.
@@ -280,12 +294,13 @@ npm run lint:fix      # Auto-fix what's possible
    * @param locale - Optional locale filter (default: "en")
    * @returns Array of matching pages with metadata
    */
-  async function searchPages(query: string, locale = 'en'): Promise<Page[]> {
+  async function searchPages(query: string, locale = "en"): Promise<Page[]> {
     // Implementation
   }
   ```
 
 - **Inline comments** for complex logic:
+
   ```typescript
   // Cache the page tree for 5 minutes to reduce API load
   const CACHE_TTL = 5 * 60 * 1000;
@@ -324,29 +339,33 @@ tests/
 **Example**:
 
 ```typescript
-import { searchPages } from '../src/handlers/tools';
+import { searchPages } from "../src/handlers/tools";
 
-describe('searchPages', () => {
-  describe('with valid query', () => {
-    it('should return matching pages', async () => {
-      const result = await searchPages('docker');
+describe("searchPages", () => {
+  describe("with valid query", () => {
+    it("should return matching pages", async () => {
+      const result = await searchPages("docker");
       expect(result).toHaveLength(3);
-      expect(result[0]).toHaveProperty('title');
+      expect(result[0]).toHaveProperty("title");
     });
   });
 
-  describe('with empty query', () => {
-    it('should throw validation error', async () => {
-      await expect(searchPages('')).rejects.toThrow('Query cannot be empty');
+  describe("with empty query", () => {
+    it("should throw validation error", async () => {
+      await expect(searchPages("")).rejects.toThrow("Query cannot be empty");
     });
   });
 
-  describe('with API error', () => {
-    it('should handle connection failures', async () => {
+  describe("with API error", () => {
+    it("should handle connection failures", async () => {
       // Mock API failure
-      jest.spyOn(graphqlClient, 'query').mockRejectedValue(new Error('Network error'));
+      jest
+        .spyOn(graphqlClient, "query")
+        .mockRejectedValue(new Error("Network error"));
 
-      await expect(searchPages('test')).rejects.toThrow('Failed to search pages');
+      await expect(searchPages("test")).rejects.toThrow(
+        "Failed to search pages",
+      );
     });
   });
 });
@@ -383,7 +402,7 @@ For testing with a real Wiki.js instance:
 3. Clean up test data after tests
 
 ```typescript
-describe('Integration: create_page', () => {
+describe("Integration: create_page", () => {
   beforeAll(async () => {
     // Setup: Ensure test environment is ready
   });
@@ -392,10 +411,14 @@ describe('Integration: create_page', () => {
     // Cleanup: Remove test pages
   });
 
-  it('should create and retrieve page', async () => {
-    const created = await createPage({ path: 'test', title: 'Test', content: 'Content' });
-    const retrieved = await getPage('test');
-    expect(retrieved.title).toBe('Test');
+  it("should create and retrieve page", async () => {
+    const created = await createPage({
+      path: "test",
+      title: "Test",
+      content: "Content",
+    });
+    const retrieved = await getPage("test");
+    expect(retrieved.title).toBe("Test");
   });
 });
 ```
@@ -428,12 +451,15 @@ Add entries to `CHANGELOG.md` under `[Unreleased]`:
 ## [Unreleased]
 
 ### Added
+
 - New `get_page_versions` tool for retrieving page history
 
 ### Changed
+
 - Improved error messages for authentication failures
 
 ### Fixed
+
 - Fixed pagination issue in `list_pages` tool
 ```
 
@@ -442,6 +468,7 @@ Add entries to `CHANGELOG.md` under `[Unreleased]`:
 ### Before Submitting
 
 1. **Ensure tests pass**:
+
    ```bash
    npm run lint
    npm run type-check
@@ -452,6 +479,7 @@ Add entries to `CHANGELOG.md` under `[Unreleased]`:
 2. **Update documentation**: README, CHANGELOG, code comments
 
 3. **Rebase on latest main**:
+
    ```bash
    git fetch upstream
    git rebase upstream/main
@@ -463,23 +491,28 @@ Add entries to `CHANGELOG.md` under `[Unreleased]`:
 
 ```markdown
 ## Description
+
 Brief description of what this PR does and why.
 
 ## Type of Change
+
 - [ ] Bug fix (non-breaking change fixing an issue)
 - [ ] New feature (non-breaking change adding functionality)
 - [ ] Breaking change (fix or feature causing existing functionality to change)
 - [ ] Documentation update
 
 ## Changes Made
+
 - Item 1
 - Item 2
 - Item 3
 
 ## Testing
+
 Describe the tests you ran and how to reproduce.
 
 ## Checklist
+
 - [ ] Code follows project style guidelines
 - [ ] Self-review completed
 - [ ] Code comments added for complex logic
@@ -498,6 +531,7 @@ Describe the tests you ran and how to reproduce.
 ### After Merge
 
 1. **Delete your branch** (optional):
+
    ```bash
    git branch -d feature/your-feature-name
    git push origin --delete feature/your-feature-name
@@ -540,11 +574,13 @@ When reporting bugs, include:
 **Actual**: Returns empty array
 
 **Steps to Reproduce**:
+
 1. Configure MCP server with valid API token
 2. Call `search_pages` tool with query "docker"
 3. Observe empty results despite pages existing
 
 **Environment**:
+
 - Node.js: v20.10.0
 - npm: 10.2.3
 - OS: Ubuntu 22.04
@@ -552,9 +588,12 @@ When reporting bugs, include:
 
 **Logs**:
 ```
+
 Error: GraphQL query returned null
-  at searchPages (src/handlers/tools.ts:42)
+at searchPages (src/handlers/tools.ts:42)
+
 ```
+
 ```
 
 ### Feature Requests
@@ -569,23 +608,25 @@ Error: GraphQL query returned null
 To add a new MCP tool:
 
 1. **Define the tool** in `src/handlers/tools.ts`:
+
    ```typescript
    export const toolDefinitions = [
      // ... existing tools
      {
-       name: 'your_new_tool',
-       description: 'What your tool does',
+       name: "your_new_tool",
+       description: "What your tool does",
        inputSchema: zodToJsonSchema(
          z.object({
-           param1: z.string().describe('Description of param1'),
-           param2: z.number().optional().describe('Optional param2'),
-         })
+           param1: z.string().describe("Description of param1"),
+           param2: z.number().optional().describe("Optional param2"),
+         }),
        ),
      },
    ];
    ```
 
 2. **Implement the handler** in the same file:
+
    ```typescript
    export const toolHandlers = {
      // ... existing handlers
@@ -593,7 +634,7 @@ To add a new MCP tool:
        // Implementation
        const result = await someOperation(args.param1);
        return {
-         content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],
+         content: [{ type: "text", text: JSON.stringify(result, null, 2) }],
        };
      },
    };
@@ -617,6 +658,7 @@ When reviewing others' code:
 ### Recognition
 
 Contributors will be:
+
 - Listed in project contributors
 - Mentioned in release notes for significant contributions
 - Credited in CHANGELOG.md
