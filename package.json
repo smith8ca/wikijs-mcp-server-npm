@@ -4,10 +4,19 @@
   "description": "Model Context Protocol server for Wiki.js - enables AI assistants to interact with Wiki.js wikis",
   "type": "module",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
     "wikijs-mcp-server": "dist/index.js"
   },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md",
+    ".env.example"
+  ],
   "scripts": {
+    "prepublishOnly": "npm run lint && npm run type-check && npm test && npm run build",
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
@@ -28,8 +37,16 @@
     "claude",
     "assistant"
   ],
-  "author": "",
+  "author": "Chuck <chuck1041@pm.me>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/smith8ca/wikijs-mcp-server-npm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/smith8ca/wikijs-mcp-server-npm/issues"
+  },
+  "homepage": "https://github.com/smith8ca/wikijs-mcp-server-npm#readme",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.0.4",
     "axios": "^1.7.9",
