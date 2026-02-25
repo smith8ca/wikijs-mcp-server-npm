@@ -93,11 +93,11 @@ npm test -- handlers/tools.test.ts     # Run a specific file
 
 Three stages triggered by push to `gitlab`:
 
-| Stage      | Triggers                          | Jobs                          |
-|------------|-----------------------------------|-------------------------------|
-| `validate` | MRs, default branch, `vX.Y.Z` tags | lint, typecheck, test        |
-| `publish`  | `vX.Y.Z` tags only                | build + publish to GitLab npm registry |
-| `sonar`    | MRs, default branch               | SonarQube scan (allow_failure) |
+| Stage      | Triggers                           | Jobs                                   |
+| ---------- | ---------------------------------- | -------------------------------------- |
+| `validate` | MRs, default branch, `vX.Y.Z` tags | lint, typecheck, test                  |
+| `publish`  | `vX.Y.Z` tags only                 | build + publish to GitLab npm registry |
+| `sonar`    | MRs, default branch                | SonarQube scan (allow_failure)         |
 
 **To publish a new version**: bump version in `package.json`, update `CHANGELOG.md`, commit, then push a `vX.Y.Z` tag to `gitlab`. The CI pipeline handles the rest.
 
