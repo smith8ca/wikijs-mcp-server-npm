@@ -228,5 +228,5 @@ Potential features for future releases:
   - Performance testing suite
   - CI/CD pipeline integration
 
-[Unreleased]: https://github.com/your-org/wikijs-mcp-server-npm/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/your-org/wikijs-mcp-server-npm/releases/tag/v1.0.0
+[Unreleased]: https://github.com/smith8ca/wikijs-mcp-server-npm/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/smith8ca/wikijs-mcp-server-npm/releases/tag/v1.0.0

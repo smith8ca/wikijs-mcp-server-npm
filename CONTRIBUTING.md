@@ -53,7 +53,7 @@ Before contributing, ensure you have:
    ```
 3. **Add upstream remote**:
    ```bash
-   git remote add upstream <original-repo-url>
+   git remote add upstream https://github.com/smith8ca/wikijs-mcp-server-npm.git
    ```
 
 ## Development Environment
