@@ -13,6 +13,7 @@ export default {
       },
     ],
   },
+  setupFiles: ['./tests/setup.ts'],
   testMatch: [
     '**/tests/**/*.test.ts',
   ],
