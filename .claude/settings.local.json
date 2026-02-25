@@ -10,7 +10,15 @@
       "Bash(npm test:*)",
       "Bash(npm publish:*)",
       "Bash(npm install:*)",
-      "Bash(npx prettier:*)"
+      "Bash(npx prettier:*)",
+      "WebFetch(domain:gethomepage.dev)",
+      "WebFetch(domain:github.com)",
+      "Bash(npx create-next-app:*)",
+      "Bash(/d/Development/projects/docker-monitor-dashboard/README.md:*)",
+      "Bash(/d/Development/projects/docker-monitor-dashboard/config/docker-hosts.example.yml:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(cd:*)"
     ]
   }
 }

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" width="560" height="100">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0EA5E9"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Icon: rounded square -->
+  <rect x="0" y="0" width="100" height="100" rx="18" fill="url(#bg)"/>
+
+  <!-- W scaled to fit 100×100 icon (scale ≈ 0.156 from 512, offset +10 each axis) -->
+  <polyline
+    points="22,27 36,67 50,39 64,67 78,27"
+    fill="none"
+    stroke="white"
+    stroke-width="9"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+
+  <!-- Project name -->
+  <text
+    x="120" y="52"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="30"
+    font-weight="700"
+    fill="#F1F5F9"
+    letter-spacing="-0.5"
+  >wikijs-mcp-server</text>
+
+  <!-- Subtitle -->
+  <text
+    x="120" y="78"
+    font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
+    font-size="15"
+    fill="#64748B"
+  >Model Context Protocol server for Wiki.js</text>
+</svg>
