@@ -1,38 +1,124 @@
-image: 
-  name: sonarsource/sonar-scanner-cli:11
-  entrypoint: [""]
-
-variables:
-  SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"  # Defines the location of the analysis task cache
-  GIT_DEPTH: "0"  # Tells git to fetch all the branches of the project, required by the analysis task
+# GitLab CI/CD configuration for wikijs-mcp-server
+#
+# Stages:
+#   validate — lint, type-check, and tests (MRs, default branch, version tags)
+#   publish  — build TypeScript and publish to GitLab npm package registry (version tags only)
+#   sonar    — SonarQube static analysis (MRs, default branch)
+#
+# Publishing is triggered automatically by pushing a tag matching vX.Y.Z.
+# Authentication uses CI_JOB_TOKEN — no manual token configuration required.
+#
+# Self-signed certificate: CI_SERVER_TLS_CA_FILE must be set as a File-type CI/CD variable
+# containing the PEM content of the GitLab instance CA. The before_script below merges it
+# with the system CA bundle and exports NODE_EXTRA_CA_CERTS so Node.js and npm trust both
+# the private GitLab registry and public registries (registry.npmjs.org).
+# NOTE: referencing a File-type variable in the YAML variables: block does NOT work because
+# GitLab writes the file to disk only after variable expansion — it must be used in scripts.
 
 stages:
-  - build-sonar
+  - validate
+  - publish
+  - sonar
 
+variables:
+  NODE_VERSION: "20"
 
-build-sonar:
-  stage: build-sonar
-  tags:
-    - docker
-  
+default:
+  image: node:${NODE_VERSION}
+  before_script:
+    - |
+      # Append the self-signed GitLab CA to the system bundle so that both
+      # private (gitlab.chuck.prod) and public (registry.npmjs.org) HTTPS work.
+      # CI_SERVER_TLS_CA_FILE is a File-type CI/CD variable — GitLab writes the PEM
+      # to a temp file and sets the variable to that path before scripts run.
+      if [ -n "$CI_SERVER_TLS_CA_FILE" ] && [ -f "$CI_SERVER_TLS_CA_FILE" ]; then
+        for ca_path in /etc/ssl/certs/ca-certificates.crt \
+                       /etc/pki/tls/certs/ca-bundle.crt \
+                       /etc/ssl/ca-bundle.pem; do
+          if [ -f "$ca_path" ]; then
+            COMBINED_CA=$(mktemp /tmp/combined-ca.XXXXXX.crt)
+            cat "$ca_path" "$CI_SERVER_TLS_CA_FILE" > "$COMBINED_CA"
+            export NODE_EXTRA_CA_CERTS="$COMBINED_CA"
+            break
+          fi
+        done
+        # Fallback: use the cert directly if no system bundle was found
+        if [ -z "$NODE_EXTRA_CA_CERTS" ]; then
+          export NODE_EXTRA_CA_CERTS="$CI_SERVER_TLS_CA_FILE"
+        fi
+      fi
+    - npm ci
+
+# ─── Validate stage ───────────────────────────────────────────────────────────
+
+validate:lint:
+  stage: validate
+  script:
+    - npm run lint
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+
+validate:typecheck:
+  stage: validate
+  script:
+    - npm run type-check
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+
+validate:test:
+  stage: validate
+  script:
+    - npm test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+
+# ─── Publish stage ────────────────────────────────────────────────────────────
+
+# Build TypeScript output and publish the npm package to this project's GitLab
+# package registry. Triggered only by version tags (e.g. v1.0.0, v1.2.3).
+# Runs after the validate stage succeeds. Uses --ignore-scripts to skip
+# prepublishOnly since lint/typecheck/test already ran in the validate stage.
+publish:npm:
+  stage: publish
+  script:
+    - npm run build
+    - echo "//${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/:_authToken=${CI_JOB_TOKEN}" > .npmrc
+    - npm publish --ignore-scripts --registry "https://${CI_SERVER_HOST}/api/v4/projects/${CI_PROJECT_ID}/packages/npm/"
+  rules:
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+/'
+
+# ─── Sonar stage ──────────────────────────────────────────────────────────────
+
+sonar:scan:
+  stage: sonar
+  image:
+    name: sonarsource/sonar-scanner-cli:11
+    entrypoint: [""]
+  before_script: []
+  variables:
+    SONAR_USER_HOME: "${CI_PROJECT_DIR}/.sonar"
+    GIT_DEPTH: "0"
   cache:
     policy: pull-push
     key: "sonar-cache-$CI_COMMIT_REF_SLUG"
     paths:
       - "${SONAR_USER_HOME}/cache"
       - sonar-scanner/
-      
   script:
     - echo "Setting up self-signed certificate trust..."
     - mkdir -p ${SONAR_USER_HOME}/ssl
     - openssl s_client -showcerts -connect sonarqube.chuck.prod:443 -servername sonarqube.chuck.prod < /dev/null 2>/dev/null | openssl x509 -outform PEM > sonarqube.chuck.prod.pem
-    - keytool -noprompt -importcert -storetype PKCS12  -alias sonarqube -keystore $SONAR_USER_HOME/ssl/truststore.p12 -storepass changeit -file sonarqube.chuck.prod.pem
-    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.scanner.truststorePassword=changeit 
-    # - sonar-scanner -Dsonar.host.url="${SONAR_HOST_URL}"
-
+    - keytool -noprompt -importcert -storetype PKCS12 -alias sonarqube -keystore $SONAR_USER_HOME/ssl/truststore.p12 -storepass changeit -file sonarqube.chuck.prod.pem
+    - sonar-scanner -Dsonar.qualitygate.wait=true -Dsonar.scanner.truststorePassword=changeit
   allow_failure: true
+  tags:
+    - docker
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_COMMIT_BRANCH == 'master'
-    - if: $CI_COMMIT_BRANCH == 'main'
-    - if: $CI_COMMIT_BRANCH == 'develop'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
